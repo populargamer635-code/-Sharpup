@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">MathSpark</string>
+    <string name="welcome_title">Train Your Super Brain!</string>
+    <string name="welcome_subtitle">Play joyful math adventures, boost memory &amp; logic, and collect shining stars.</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_in_hint">Parent or kid Google account saves stars &amp; progress safely across devices.</string>
+    <string name="nav_play">Play</string>
+    <string name="nav_leaderboard">Leaderboard</string>
+    <string name="nav_brain_lab">Brain Lab</string>
+    <string name="nav_trophies">Trophies</string>
+    <string name="nav_profile">Profile</string>
+    <string name="sign_out">Sign out</string>
+    <string name="daily_brain_quest">Daily Brain Spark</string>
+    <string name="choose_adventure">Choose Your Brain Game</string>
+    <string name="skill_level_label">Skill Level</string>
+    <string name="brain_sharpness_title">Brain Sharpness</string>
+    <string name="recent_adventures">Recent Adventures</string>
+    <string name="no_sessions_yet">Play your first math game to light up your brain chart!</string>
+    <string name="show_visual_helper">Show Counting Blocks</string>
+    <string name="hide_visual_helper">Hide Counting Blocks</string>
+    <string name="play_again">Play Again</string>
+    <string name="back_home">Back to Home</string>
+</resources>

@@ -1,0 +1,245 @@
+{
+  "entities": {
+    "ChildProfile": {
+      "title": "ChildProfile",
+      "description": "Child math learner profile, brain sharpness metrics, stars, streak, and unlocked badges.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this profile."
+        },
+        "childName": {
+          "type": "string",
+          "description": "Display nickname of the child."
+        },
+        "avatarId": {
+          "type": "string",
+          "enum": ["owl", "fox", "panda", "rocket", "star", "dino"],
+          "description": "Selected mascot avatar identifier."
+        },
+        "difficultyTier": {
+          "type": "string",
+          "enum": ["EXPLORER", "CHALLENGER", "GENIUS"],
+          "description": "Current adaptive difficulty tier."
+        },
+        "totalStars": {
+          "type": "integer",
+          "description": "Cumulative stars earned."
+        },
+        "brainScore": {
+          "type": "integer",
+          "description": "Overall Brain Sharpness Index (0-999)."
+        },
+        "arithmeticSkill": {
+          "type": "integer",
+          "description": "Arithmetic mastery score (0-100)."
+        },
+        "speedSkill": {
+          "type": "integer",
+          "description": "Mental speed score (0-100)."
+        },
+        "logicSkill": {
+          "type": "integer",
+          "description": "Pattern & logic score (0-100)."
+        },
+        "memorySkill": {
+          "type": "integer",
+          "description": "Working memory & balance equation score (0-100)."
+        },
+        "currentStreakDays": {
+          "type": "integer",
+          "description": "Consecutive active days count."
+        },
+        "bestStreakCombo": {
+          "type": "integer",
+          "description": "Best consecutive correct answer combo."
+        },
+        "sessionsCompleted": {
+          "type": "integer",
+          "description": "Total completed brain training sessions."
+        },
+        "totalCorrect": {
+          "type": "integer",
+          "description": "Total correct answers across all games."
+        },
+        "totalAnswered": {
+          "type": "integer",
+          "description": "Total questions answered across all games."
+        },
+        "lastPlayedDate": {
+          "type": "string",
+          "description": "YYYY-MM-DD local date string of last completed session."
+        },
+        "unlockedBadges": {
+          "type": "array",
+          "description": "List of earned badge identifiers (max 20)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "childName",
+        "avatarId",
+        "difficultyTier",
+        "totalStars",
+        "brainScore",
+        "arithmeticSkill",
+        "speedSkill",
+        "logicSkill",
+        "memorySkill",
+        "currentStreakDays",
+        "bestStreakCombo",
+        "sessionsCompleted",
+        "totalCorrect",
+        "totalAnswered",
+        "lastPlayedDate",
+        "unlockedBadges",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "GameSession": {
+      "title": "GameSession",
+      "description": "Completed math and brain training game round record.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this session."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["ARITHMETIC", "SPEED_SPRINT", "PATTERN_LOGIC", "MEMORY_BALANCE"],
+          "description": "Brain training game mode."
+        },
+        "difficultyTier": {
+          "type": "string",
+          "enum": ["EXPLORER", "CHALLENGER", "GENIUS"],
+          "description": "Difficulty tier played."
+        },
+        "score": {
+          "type": "integer",
+          "description": "Points earned in this round."
+        },
+        "starsEarned": {
+          "type": "integer",
+          "description": "Stars awarded for this round."
+        },
+        "correctCount": {
+          "type": "integer",
+          "description": "Number of correct answers."
+        },
+        "totalQuestions": {
+          "type": "integer",
+          "description": "Total questions attempted."
+        },
+        "bestCombo": {
+          "type": "integer",
+          "description": "Highest consecutive answer streak in this round."
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "description": "Round duration in seconds."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when session was recorded (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "mode",
+        "difficultyTier",
+        "score",
+        "starsEarned",
+        "correctCount",
+        "totalQuestions",
+        "bestCombo",
+        "durationSeconds",
+        "createdAt"
+      ]
+    },
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Public non-PII leaderboard summary for a child learner.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this leaderboard entry."
+        },
+        "childName": {
+          "type": "string",
+          "description": "Public nickname of the child."
+        },
+        "avatarId": {
+          "type": "string",
+          "enum": ["owl", "fox", "panda", "rocket", "star", "dino"],
+          "description": "Selected mascot avatar identifier."
+        },
+        "difficultyTier": {
+          "type": "string",
+          "enum": ["EXPLORER", "CHALLENGER", "GENIUS"],
+          "description": "Current difficulty tier."
+        },
+        "totalStars": {
+          "type": "integer",
+          "description": "Cumulative stars earned."
+        },
+        "brainScore": {
+          "type": "integer",
+          "description": "Overall Brain Sharpness Index (0-999)."
+        },
+        "currentStreakDays": {
+          "type": "integer",
+          "description": "Consecutive active days count."
+        },
+        "publicEntry": {
+          "type": "boolean",
+          "description": "Flag indicating public visibility on the leaderboard."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when entry was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "childName",
+        "avatarId",
+        "difficultyTier",
+        "totalStars",
+        "brainScore",
+        "currentStreakDays",
+        "publicEntry",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/ChildProfile" },
+      "description": "Per-user child profile, brain sharpness scores, stars, and badges."
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/GameSession" },
+      "description": "Immutable history of completed math and brain-training rounds."
+    },
+    "/leaderboard/{userId}": {
+      "schema": { "$ref": "#/entities/LeaderboardEntry" },
+      "description": "Non-PII public leaderboard entries readable by signed-in learners and writable only by the owner."
+    }
+  }
+}

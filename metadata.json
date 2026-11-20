@@ -1,0 +1,6 @@
+{
+  "name": "MathSpark",
+  "description": "A playful math and brain-training app where children sharpen arithmetic, speed, pattern logic, and mental agility.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

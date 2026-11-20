@@ -1,0 +1,188 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global safety net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidAvatar(avatarId) {
+      return avatarId in ['owl', 'fox', 'panda', 'rocket', 'star', 'dino'];
+    }
+
+    function isValidDifficulty(tier) {
+      return tier in ['EXPLORER', 'CHALLENGER', 'GENIUS'];
+    }
+
+    function isValidGameMode(mode) {
+      return mode in ['ARITHMETIC', 'SPEED_SPRINT', 'PATTERN_LOGIC', 'MEMORY_BALANCE'];
+    }
+
+    function isValidChildProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.childName is string && data.childName.size() >= 1 && data.childName.size() <= 30 &&
+             data.avatarId is string && isValidAvatar(data.avatarId) &&
+             data.difficultyTier is string && isValidDifficulty(data.difficultyTier) &&
+             data.totalStars is int && data.totalStars >= 0 && data.totalStars <= 1000000 &&
+             data.brainScore is int && data.brainScore >= 0 && data.brainScore <= 999 &&
+             data.arithmeticSkill is int && data.arithmeticSkill >= 0 && data.arithmeticSkill <= 100 &&
+             data.speedSkill is int && data.speedSkill >= 0 && data.speedSkill <= 100 &&
+             data.logicSkill is int && data.logicSkill >= 0 && data.logicSkill <= 100 &&
+             data.memorySkill is int && data.memorySkill >= 0 && data.memorySkill <= 100 &&
+             data.currentStreakDays is int && data.currentStreakDays >= 0 && data.currentStreakDays <= 10000 &&
+             data.bestStreakCombo is int && data.bestStreakCombo >= 0 && data.bestStreakCombo <= 1000 &&
+             data.sessionsCompleted is int && data.sessionsCompleted >= 0 && data.sessionsCompleted <= 100000 &&
+             data.totalCorrect is int && data.totalCorrect >= 0 && data.totalCorrect <= 1000000 &&
+             data.totalAnswered is int && data.totalAnswered >= 0 && data.totalAnswered <= 1000000 &&
+             data.totalCorrect <= data.totalAnswered &&
+             data.lastPlayedDate is string && data.lastPlayedDate.size() <= 10 &&
+             data.unlockedBadges is list && data.unlockedBadges.size() <= 20 &&
+             (data.unlockedBadges.size() == 0 || (data.unlockedBadges[0] is string && data.unlockedBadges[0].size() <= 40)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidGameSession(data, userId) {
+      return data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.mode is string && isValidGameMode(data.mode) &&
+             data.difficultyTier is string && isValidDifficulty(data.difficultyTier) &&
+             data.score is int && data.score >= 0 && data.score <= 100000 &&
+             data.starsEarned is int && data.starsEarned >= 0 && data.starsEarned <= 500 &&
+             data.correctCount is int && data.correctCount >= 0 && data.correctCount <= 200 &&
+             data.totalQuestions is int && data.totalQuestions >= 1 && data.totalQuestions <= 200 &&
+             data.correctCount <= data.totalQuestions &&
+             data.bestCombo is int && data.bestCombo >= 0 && data.bestCombo <= 200 &&
+             data.durationSeconds is int && data.durationSeconds >= 1 && data.durationSeconds <= 3600 &&
+             data.createdAt is timestamp && data.createdAt <= request.time;
+    }
+
+    function isValidLeaderboardEntry(data, userId) {
+      return data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.childName is string && data.childName.size() >= 1 && data.childName.size() <= 30 &&
+             data.avatarId is string && isValidAvatar(data.avatarId) &&
+             data.difficultyTier is string && isValidDifficulty(data.difficultyTier) &&
+             data.totalStars is int && data.totalStars >= 0 && data.totalStars <= 1000000 &&
+             data.brainScore is int && data.brainScore >= 0 && data.brainScore <= 999 &&
+             data.currentStreakDays is int && data.currentStreakDays >= 0 && data.currentStreakDays <= 10000 &&
+             data.publicEntry is bool && data.publicEntry == true &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll([
+                         'userId', 'childName', 'avatarId', 'difficultyTier',
+                         'totalStars', 'brainScore', 'arithmeticSkill', 'speedSkill',
+                         'logicSkill', 'memorySkill', 'currentStreakDays', 'bestStreakCombo',
+                         'sessionsCompleted', 'totalCorrect', 'totalAnswered',
+                         'lastPlayedDate', 'unlockedBadges', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'childName', 'avatarId', 'difficultyTier',
+                         'totalStars', 'brainScore', 'arithmeticSkill', 'speedSkill',
+                         'logicSkill', 'memorySkill', 'currentStreakDays', 'bestStreakCombo',
+                         'sessionsCompleted', 'totalCorrect', 'totalAnswered',
+                         'lastPlayedDate', 'unlockedBadges', 'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidChildProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidChildProfile(incoming()) && (
+                         // Action 1: Customize profile nickname, mascot avatar, or difficulty tier
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'childName', 'avatarId', 'difficultyTier', 'updatedAt'
+                         ]) ||
+                         // Action 2: Record game progress, stars, skills, streak, and badges
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'totalStars', 'brainScore', 'arithmeticSkill', 'speedSkill',
+                           'logicSkill', 'memorySkill', 'currentStreakDays', 'bestStreakCombo',
+                           'sessionsCompleted', 'totalCorrect', 'totalAnswered',
+                           'lastPlayedDate', 'unlockedBadges', 'updatedAt'
+                         ])
+                       );
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /sessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId) && isValidId(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(sessionId) &&
+                         incoming().keys().hasAll([
+                           'userId', 'mode', 'difficultyTier', 'score', 'starsEarned',
+                           'correctCount', 'totalQuestions', 'bestCombo', 'durationSeconds', 'createdAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'mode', 'difficultyTier', 'score', 'starsEarned',
+                           'correctCount', 'totalQuestions', 'bestCombo', 'durationSeconds', 'createdAt'
+                         ]) &&
+                         isValidGameSession(incoming(), userId);
+
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(sessionId);
+      }
+    }
+
+    match /leaderboard/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && existing().publicEntry == true;
+      allow list: if isSignedIn() && existing().publicEntry == true;
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll([
+                         'userId', 'childName', 'avatarId', 'difficultyTier',
+                         'totalStars', 'brainScore', 'currentStreakDays', 'publicEntry', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'childName', 'avatarId', 'difficultyTier',
+                         'totalStars', 'brainScore', 'currentStreakDays', 'publicEntry', 'updatedAt'
+                       ]) &&
+                       isValidLeaderboardEntry(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       isValidLeaderboardEntry(incoming(), userId) && (
+                         // Action 1: Sync profile customization to leaderboard
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'childName', 'avatarId', 'difficultyTier', 'updatedAt'
+                         ]) ||
+                         // Action 2: Sync game progress to leaderboard
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'totalStars', 'brainScore', 'currentStreakDays', 'updatedAt'
+                         ])
+                       );
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+  }
+}
